@@ -15,6 +15,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 ROOT = Path(__file__).parent
 ASSETS = ROOT / "assets"
 WORKBOOK_PATH = ROOT / "C&K.xlsx"
+DEFAULT_SITE_PASSWORD = "K&C Wedding"
 
 
 @dataclass(frozen=True)
@@ -331,6 +332,134 @@ def html_block(markup: str) -> None:
     st.html(markup)
 
 
+def site_password() -> str:
+    try:
+        return str(st.secrets.get("site_password", DEFAULT_SITE_PASSWORD))
+    except Exception:
+        return DEFAULT_SITE_PASSWORD
+
+
+def password_screen() -> bool:
+    if st.session_state.get("site_unlocked"):
+        return True
+
+    logo = image_uri(ASSETS / "logo-burgundy.png")
+    html_block(
+        f"""
+        <style>
+        header[data-testid="stHeader"],
+        div[data-testid="stToolbar"],
+        div[data-testid="stDecoration"],
+        footer {{ display: none; }}
+        .block-container {{ max-width: none; padding: 0; }}
+        .stApp {{
+          min-height: 100vh;
+          background:
+            radial-gradient(circle at 24% 18%, rgba(214, 195, 163, 0.26), transparent 30%),
+            linear-gradient(135deg, #fffaf7, #f8f5f2 58%, #ede6df);
+          color: #2b2b2b;
+          font-family: Lato, Avenir, "Segoe UI", sans-serif;
+        }}
+        .private-entry {{
+          min-height: 56vh;
+          display: grid;
+          place-items: end center;
+          padding: 32px 18px 18px;
+        }}
+        .private-card {{
+          width: min(520px, 100%);
+          padding: clamp(28px, 6vw, 48px);
+          border: 1px solid rgba(123, 38, 56, 0.14);
+          border-radius: 10px;
+          background: rgba(255, 250, 247, 0.92);
+          box-shadow: 0 28px 80px rgba(72, 41, 35, 0.14);
+          text-align: center;
+        }}
+        .private-card img {{
+          width: 86px;
+          margin-bottom: 22px;
+          filter: drop-shadow(0 8px 18px rgba(88, 23, 37, 0.12));
+        }}
+        .private-card .eyebrow {{
+          margin: 0 0 12px;
+          color: #a97724;
+          font-size: 0.75rem;
+          font-weight: 900;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+        }}
+        .private-card h1 {{
+          margin: 0;
+          color: #7b2638;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(2.4rem, 8vw, 4rem);
+          line-height: 0.96;
+        }}
+        .private-card p {{
+          margin: 16px auto 0;
+          max-width: 360px;
+          color: #6f625c;
+          line-height: 1.65;
+        }}
+        div[data-testid="stTextInput"] {{
+          width: min(420px, calc(100% - 36px));
+          margin: 0 auto;
+        }}
+        div[data-testid="stTextInput"] label {{
+          color: #2b2b2b;
+          font-weight: 900;
+        }}
+        div[data-testid="stTextInput"] input {{
+          min-height: 52px;
+          border-radius: 999px;
+          border: 1px solid rgba(123, 38, 56, 0.18);
+          background: #fffaf7;
+          color: #2b2b2b;
+        }}
+        div.stButton {{
+          width: min(420px, calc(100% - 36px));
+          margin: 16px auto 0;
+        }}
+        div.stButton > button {{
+          min-height: 48px;
+          border: 0;
+          border-radius: 999px;
+          background: #7b2638;
+          color: #fff;
+          font-weight: 900;
+          box-shadow: 0 16px 38px rgba(88, 23, 37, 0.18);
+        }}
+        div.stButton > button:hover {{ background: #581725; }}
+        div[data-testid="stAlert"] {{
+          width: min(420px, calc(100% - 36px));
+          margin: 14px auto 0;
+          border-radius: 8px;
+        }}
+        </style>
+        <section class="private-entry">
+          <div class="private-card">
+            <img src="{logo}" alt="">
+            <p class="eyebrow">Private celebration</p>
+            <h1>Celine &amp; Kiran</h1>
+            <p>Please enter the wedding password to view the invitation.</p>
+          </div>
+        </section>
+        """
+    )
+
+    with st.form("wedding_password_form"):
+        password = st.text_input("Password", type="password", placeholder="Enter password")
+        submitted = st.form_submit_button("Enter wedding website", use_container_width=True)
+
+    if submitted:
+        if password.strip() == site_password():
+            st.session_state["site_unlocked"] = True
+            st.rerun()
+        st.error("That password is not quite right. Please try again.")
+
+    return False
+
+
 def nav(data: dict[str, object]) -> None:
     html_block(
         f"""
@@ -525,6 +654,9 @@ def footer(data: dict[str, object]) -> None:
 
 def main() -> None:
     st.set_page_config(page_title="Celine & Kiran | Wedding", page_icon="CK", layout="wide", initial_sidebar_state="collapsed")
+    if not password_screen():
+        st.stop()
+
     data = load_data()
     html_block(css(data))
     nav(data)
