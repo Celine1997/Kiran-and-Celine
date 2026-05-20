@@ -502,7 +502,7 @@ def story(data: dict[str, object]) -> None:
           <div class="section-grid">
             <div>
               <p class="eyebrow">Our Love Story</p>
-              <h2>Not love at first sight. Something better.</h2>
+              <h2>Written slowly, loved deeply, timed perfectly.</h2>
               <p class="pull-quote">What we wound up building was not just a relationship, but a true partnership.</p>
             </div>
             <div class="story-copy">{paragraphs}</div>
