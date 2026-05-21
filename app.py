@@ -16,7 +16,7 @@ ROOT = Path(__file__).parent
 ASSETS = ROOT / "assets"
 WORKBOOK_PATH = ROOT / "C&K.xlsx"
 DEFAULT_SITE_PASSWORD = "K&C Wedding"
-MUSIC_URL = "/app/static/wedding-song.mp3"
+MUSIC_URL = "/app/static/CelineandKiran.mp3"
 
 
 @dataclass(frozen=True)
