@@ -16,7 +16,7 @@ ROOT = Path(__file__).parent
 ASSETS = ROOT / "assets"
 WORKBOOK_PATH = ROOT / "C&K.xlsx"
 DEFAULT_SITE_PASSWORD = "K&C Wedding"
-MUSIC_URL = "/app/static/CelineandKiran.mp3"
+MUSIC_PATH = ROOT / "static" / "CelineandKiran.mp3"
 
 
 @dataclass(frozen=True)
@@ -32,6 +32,13 @@ def image_uri(path: Path) -> str:
         return ""
     encoded = base64.b64encode(path.read_bytes()).decode("utf-8")
     return f"data:image/png;base64,{encoded}"
+
+
+@st.cache_data(show_spinner=False)
+def audio_data_uri(path: str) -> str:
+    audio_path = Path(path)
+    encoded = base64.b64encode(audio_path.read_bytes()).decode("utf-8")
+    return f"data:audio/mpeg;base64,{encoded}"
 
 
 def rows(sheet_name: str) -> list[list[object]]:
@@ -670,18 +677,24 @@ def rsvp(data: dict[str, object]) -> None:
 
 
 def footer(data: dict[str, object]) -> None:
+    music_html = ""
+    if MUSIC_PATH.exists():
+        music_html = f"""
+        <div class="music-player-wrap">
+          <span>Play our song</span>
+          <audio controls preload="none" loop controlslist="nodownload">
+            <source src="{audio_data_uri(str(MUSIC_PATH))}" type="audio/mpeg">
+          </audio>
+        </div>
+        """
+
     html_block(
         f"""
         <footer class="site-footer">
           <span>Love, laughter, and a happily ever after.</span>
           <span class="couple">{escape(str(data["couple"]))}</span>
         </footer>
-        <div class="music-player-wrap">
-          <span>Play our song</span>
-          <audio controls preload="none" loop controlslist="nodownload">
-            <source src="{MUSIC_URL}" type="audio/mpeg">
-          </audio>
-        </div>
+        {music_html}
         <a class="sticky-rsvp" href="#rsvp">RSVP</a>
         """
     )

@@ -7,8 +7,8 @@ Streamlit wedding website for Celine and Kiran.
 - `app.py` renders the website, password screen, music player, and RSVP lookup.
 - `C&K.xlsx` supplies the wedding copy, event details, registry text, guest list, and RSVP response sheet.
 - `assets/` supplies the logo and hero image.
-- `static/CelineandKiran.mp3` supplies the optional background song.
-- `.streamlit/config.toml` supplies the Streamlit theme and enables static file serving.
+- `static/CelineandKiran.mp3` supplies the optional background song, which is read directly by `app.py`.
+- `.streamlit/config.toml` supplies the Streamlit theme.
 
 ## Streamlit Deploy
 
