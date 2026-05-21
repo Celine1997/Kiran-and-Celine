@@ -16,6 +16,7 @@ ROOT = Path(__file__).parent
 ASSETS = ROOT / "assets"
 WORKBOOK_PATH = ROOT / "C&K.xlsx"
 DEFAULT_SITE_PASSWORD = "K&C Wedding"
+MUSIC_URL = "/app/static/Celine%20and%20Kiran%20V1.mp3"
 
 
 @dataclass(frozen=True)
@@ -304,6 +305,33 @@ def css(data: dict[str, object]) -> str:
     .site-footer {{ display: flex; align-items: center; justify-content: space-between; gap: 22px; min-height: 76px; padding: 24px clamp(18px,6vw,88px); color: #fff; background: var(--burgundy); font-weight: 900; }}
     .site-footer .couple {{ font-family: Georgia, serif; font-size: 1.35rem; white-space: nowrap; }}
     .sticky-rsvp {{ position: fixed; right: 18px; bottom: 18px; z-index: 40; min-height: 42px; padding: 0 16px; font-size: .78rem; }}
+    .music-player-wrap {{
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      z-index: 39;
+      display: grid;
+      gap: 6px;
+      width: min(300px, calc(100vw - 36px));
+      padding: 10px 12px;
+      border: 1px solid rgba(214, 195, 163, 0.42);
+      border-radius: 10px;
+      background: rgba(255, 250, 247, 0.9);
+      box-shadow: 0 18px 44px rgba(72, 41, 35, 0.12);
+      backdrop-filter: blur(14px);
+    }}
+    .music-player-wrap span {{
+      color: var(--burgundy);
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }}
+    .music-player-wrap audio {{
+      width: 100%;
+      height: 34px;
+      display: block;
+    }}
     @keyframes weddingFloat {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-5px); }} }}
     @media (max-width: 860px) {{
       .desktop-nav {{ display: none; }}
@@ -323,6 +351,7 @@ def css(data: dict[str, object]) -> str:
       .timeline li {{ grid-template-columns: 1fr; }}
       .site-footer {{ display: grid; }}
       .sticky-rsvp {{ display: none; }}
+      .music-player-wrap {{ left: 12px; right: 12px; bottom: 12px; width: auto; }}
     }}
     </style>
     """
@@ -647,6 +676,12 @@ def footer(data: dict[str, object]) -> None:
           <span>Love, laughter, and a happily ever after.</span>
           <span class="couple">{escape(str(data["couple"]))}</span>
         </footer>
+        <div class="music-player-wrap">
+          <span>Play our song</span>
+          <audio controls preload="none" loop controlslist="nodownload">
+            <source src="{MUSIC_URL}" type="audio/mpeg">
+          </audio>
+        </div>
         <a class="sticky-rsvp" href="#rsvp">RSVP</a>
         """
     )
