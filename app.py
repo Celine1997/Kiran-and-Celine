@@ -24,7 +24,7 @@ ALBUM_PHOTOS = [
         "file": "01-first-valentines-day-hyatt.webp",
         "title": "First Valentine's Day",
         "caption": "Hyatt, and the first little celebration that became part of the story.",
-        "class": "portrait mini",
+        "class": "landscape",
     },
     {"file": "02-first-small-trip-tobago.webp", "title": "First Small Trip", "caption": "Tobago gave us sun, sea, and one of our first adventures.", "class": "landscape large"},
     {"file": "03-first-diwali-together.webp", "title": "First Diwali Together", "caption": "A bright beginning, dressed in tradition and warmth.", "class": "portrait"},
@@ -67,7 +67,7 @@ def image_uri(path: Path) -> str:
 
 
 @st.cache_data(show_spinner=False)
-def album_image_uri(path: str) -> str:
+def album_image_uri(path: str, modified_ns: int, size: int) -> str:
     image_path = Path(path)
     encoded = base64.b64encode(image_path.read_bytes()).decode("utf-8")
     return f"data:image/webp;base64,{encoded}"
@@ -600,10 +600,11 @@ def gallery() -> None:
         path = ALBUM_ASSETS / str(photo["file"])
         if not path.exists():
             continue
+        stat = path.stat()
         cards.append(
             f"""
             <figure class="album-card {escape(str(photo["class"]))}">
-              <img src="{album_image_uri(str(path))}" alt="{escape(str(photo["title"]))}" loading="lazy">
+              <img src="{album_image_uri(str(path), stat.st_mtime_ns, stat.st_size)}" alt="{escape(str(photo["title"]))}" loading="lazy">
               <figcaption class="album-caption">
                 <strong>{escape(str(photo["title"]))}</strong>
                 <span>{escape(str(photo["caption"]))}</span>
