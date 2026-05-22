@@ -315,7 +315,6 @@ def css(data: dict[str, object]) -> str:
     .album-card:hover, .event-card:hover {{ transform: translateY(-4px); box-shadow: 0 34px 86px rgba(72,41,35,.18); }}
     .album-card img {{ width: 100%; height: auto; display: block; background: var(--linen); transition: filter 500ms ease; }}
     .album-card:hover img {{ filter: saturate(1.04) contrast(1.02); }}
-    .album-card.small {{ width: 82%; margin-left: 9%; margin-right: 9%; }}
     .album-card.mini {{ width: 72%; margin-left: 14%; margin-right: 14%; }}
     .album-card.double {{ width: 100%; }}
     .album-card.large .album-caption {{ padding: 12px 14px 13px; }}
@@ -400,7 +399,6 @@ def css(data: dict[str, object]) -> str:
       .nav-button {{ min-height: 38px; padding: 0 14px; }}
       .section {{ padding-inline: 16px; }}
       .album-grid {{ column-count: 1; }}
-      .album-card.small {{ width: 100%; margin-left: 0; margin-right: 0; }}
       .album-card.mini, .album-card.double {{ width: 100%; margin-left: 0; margin-right: 0; }}
       .album-caption strong {{ font-size: 1.25rem; }}
       .album-caption span {{ font-size: .82rem; }}
