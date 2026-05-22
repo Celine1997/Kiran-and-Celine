@@ -42,13 +42,12 @@ ALBUM_PHOTOS = [
     {"file": "15-first-trip-with-celines-family.webp", "title": "Celine's Family Trip", "caption": "A first trip with family, and another piece of home coming together.", "class": "landscape large double"},
     {"file": "16-first-disney-trip.webp", "title": "First Disney Trip", "caption": "A little magic, a little wonder, and a memory we will always keep.", "class": "landscape large double"},
     {"file": "17-celines-friends.webp", "title": "Celine's Friends", "caption": "Blending worlds, sharing laughs, and making room for more love.", "class": "landscape large double"},
-    {"file": "18-little-christmas-moment.webp", "title": "A Little Christmas Moment", "caption": "One of those tiny candid seconds that says everything.", "class": "portrait mini"},
-    {"file": "19-quiet-wedding-detail.webp", "title": "A Quiet Detail", "caption": "A soft little reflection from a day filled with meaning.", "class": "mini"},
     {"file": "20-candid-sweetness.webp", "title": "Candid Sweetness", "caption": "The unplanned moments always seem to know us best.", "class": "portrait"},
     {"file": "21-meeting-kirans-friends.webp", "title": "Meeting Kiran's Friends", "caption": "New faces, easy laughter, and another circle becoming part of our story.", "class": "landscape"},
     {"file": "22-candid-nine.webp", "title": "A Sweet Candid", "caption": "A quiet little moment tucked between the bigger memories.", "class": "mini"},
     {"file": "23-candid-fourteen.webp", "title": "Caught In The Glow", "caption": "One of those happy, unplanned smiles that feels like us.", "class": "landscape"},
     {"file": "24-candid-seventeen.webp", "title": "Another Little Chapter", "caption": "A small candid memory, but one we are glad to keep.", "class": ""},
+    {"file": "25-candid-three.webp", "title": "An Easy Little Moment", "caption": "A simple candid memory, sweet because it was completely us.", "class": "portrait mini"},
 ]
 
 
