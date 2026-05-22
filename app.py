@@ -17,6 +17,39 @@ ASSETS = ROOT / "assets"
 WORKBOOK_PATH = ROOT / "C&K.xlsx"
 DEFAULT_SITE_PASSWORD = "K&C Wedding"
 MUSIC_PATH = ROOT / "static" / "CelineandKiran.mp3"
+ALBUM_ASSETS = ASSETS / "album" / "optimized"
+
+ALBUM_PHOTOS = [
+    {
+        "file": "01-first-valentines-day-hyatt.webp",
+        "title": "First Valentine's Day",
+        "caption": "Hyatt, and the first little celebration that became part of the story.",
+        "class": "portrait mini",
+    },
+    {"file": "02-first-small-trip-tobago.webp", "title": "First Small Trip", "caption": "Tobago gave us sun, sea, and one of our first adventures.", "class": "landscape large"},
+    {"file": "03-first-diwali-together.webp", "title": "First Diwali Together", "caption": "A bright beginning, dressed in tradition and warmth.", "class": "portrait"},
+    {"file": "04-first-christmas-together.webp", "title": "First Christmas Together", "caption": "Lights, laughter, and a season that felt like home.", "class": "mini"},
+    {"file": "05-kirans-family-brunch.webp", "title": "Kiran's Family Brunch", "caption": "Family time, full hearts, and the joy of being welcomed in.", "class": "landscape double"},
+    {"file": "06-first-big-trip-cancun.webp", "title": "First Big Trip", "caption": "Cancun, where travel started becoming one of our favourite chapters.", "class": "portrait mini"},
+    {"file": "07-first-beach-day-maracas.webp", "title": "First Beach Day", "caption": "Maracas sun, salty air, and an easy kind of happiness.", "class": ""},
+    {"file": "08-first-theme-park-together.webp", "title": "First Theme Park", "caption": "A day made for wonder, queues, castles, and shared snacks.", "class": "portrait"},
+    {"file": "09-working-out-together.webp", "title": "Working Out Together", "caption": "Proof that even the ordinary routines became memories.", "class": "landscape large"},
+    {"file": "10-birthday-trips-together.webp", "title": "Birthday Trips", "caption": "Another year, another trip, another reason to celebrate us.", "class": "portrait"},
+    {"file": "11-our-first-wedding-together.webp", "title": "Our First Wedding Together", "caption": "A glimpse of forever before it was our turn.", "class": ""},
+    {"file": "12-kirans-friend-group-lime.webp", "title": "Friend Group Lime", "caption": "The kind of night that reminds you love comes with a whole circle.", "class": "landscape"},
+    {"file": "13-first-carnival-together.webp", "title": "First Carnival Together", "caption": "Colour, music, movement, and one unforgettable first.", "class": "portrait"},
+    {"file": "14-first-water-park-together.webp", "title": "First Water Park", "caption": "A sunny day for laughing, splashing, and not taking life too seriously.", "class": ""},
+    {"file": "15-first-trip-with-celines-family.webp", "title": "Celine's Family Trip", "caption": "A first trip with family, and another piece of home coming together.", "class": "landscape large double"},
+    {"file": "16-first-disney-trip.webp", "title": "First Disney Trip", "caption": "A little magic, a little wonder, and a memory we will always keep.", "class": "landscape large double"},
+    {"file": "17-celines-friends.webp", "title": "Celine's Friends", "caption": "Blending worlds, sharing laughs, and making room for more love.", "class": "landscape large double"},
+    {"file": "18-little-christmas-moment.webp", "title": "A Little Christmas Moment", "caption": "One of those tiny candid seconds that says everything.", "class": "portrait mini"},
+    {"file": "19-quiet-wedding-detail.webp", "title": "A Quiet Detail", "caption": "A soft little reflection from a day filled with meaning.", "class": "mini"},
+    {"file": "20-candid-sweetness.webp", "title": "Candid Sweetness", "caption": "The unplanned moments always seem to know us best.", "class": "portrait"},
+    {"file": "21-meeting-kirans-friends.webp", "title": "Meeting Kiran's Friends", "caption": "New faces, easy laughter, and another circle becoming part of our story.", "class": "landscape"},
+    {"file": "22-candid-nine.webp", "title": "A Sweet Candid", "caption": "A quiet little moment tucked between the bigger memories.", "class": "mini"},
+    {"file": "23-candid-fourteen.webp", "title": "Caught In The Glow", "caption": "One of those happy, unplanned smiles that feels like us.", "class": "landscape"},
+    {"file": "24-candid-seventeen.webp", "title": "Another Little Chapter", "caption": "A small candid memory, but one we are glad to keep.", "class": ""},
+]
 
 
 @dataclass(frozen=True)
@@ -32,6 +65,13 @@ def image_uri(path: Path) -> str:
         return ""
     encoded = base64.b64encode(path.read_bytes()).decode("utf-8")
     return f"data:image/png;base64,{encoded}"
+
+
+@st.cache_data(show_spinner=False)
+def album_image_uri(path: str) -> str:
+    image_path = Path(path)
+    encoded = base64.b64encode(image_path.read_bytes()).decode("utf-8")
+    return f"data:image/webp;base64,{encoded}"
 
 
 @st.cache_data(show_spinner=False)
@@ -262,7 +302,7 @@ def css(data: dict[str, object]) -> str:
     .gallery, .rsvp {{ background: #fff; }}
     .details {{ background: var(--linen); }}
     .registry {{ background: var(--ivory); }}
-    .section-grid, .section-intro, .gallery-grid, .event-grid, .registry-layout {{ width: min(1120px, 100%); margin-inline: auto; }}
+    .section-grid, .section-intro, .album-grid, .event-grid, .registry-layout {{ width: min(1120px, 100%); margin-inline: auto; }}
     .section-grid {{ display: grid; grid-template-columns: minmax(250px,.8fr) minmax(0,1.25fr); gap: clamp(34px,6vw,82px); align-items: start; }}
     .section-intro {{ margin-bottom: 34px; }}
     .section-intro p, .registry-note p, .rsvp-heading p {{ max-width: 660px; margin-top: 14px; color: var(--muted); }}
@@ -270,19 +310,25 @@ def css(data: dict[str, object]) -> str:
     .pull-quote {{ margin-top: 28px; padding-top: 18px; border-top: 1px solid rgba(123,38,56,.18); color: var(--sage); font-weight: 900; }}
     .story-copy {{ display: grid; gap: 18px; color: rgba(43,43,43,.86); font-size: clamp(1rem,1.5vw,1.12rem); }}
 
-    .gallery-grid {{ display: grid; grid-template-columns: 1.08fr .76fr .76fr; grid-template-rows: 220px 220px; gap: 18px; }}
-    .memory-tile {{ position: relative; display: grid; align-content: space-between; min-height: 190px; padding: 20px; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); transition: transform 220ms ease, box-shadow 220ms ease; }}
-    .memory-tile:hover, .event-card:hover {{ transform: translateY(-4px); box-shadow: 0 34px 86px rgba(72,41,35,.18); }}
-    .memory-tile::after {{ content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 20% 15%, rgba(255,250,247,.22), transparent 34%); }}
-    .memory-tile span, .memory-tile strong {{ position: relative; z-index: 1; }}
-    .memory-tile span {{ color: rgba(255,255,255,.68); font-family: Georgia, serif; font-size: 3.4rem; font-weight: 700; line-height: .9; }}
-    .memory-tile strong {{ color: #fff; font-size: 1.04rem; line-height: 1.25; }}
-    .memory-tile.feature {{ grid-row: span 2; background: linear-gradient(0deg, rgba(49,21,24,.62), rgba(49,21,24,.06)), linear-gradient(135deg,#efe2dd,#c8bfb6); }}
-    .memory-tile.blush {{ background: linear-gradient(135deg,#d9b7a5,var(--burgundy)); }}
-    .memory-tile.burgundy {{ background: var(--burgundy); }}
-    .memory-tile.sage {{ background: linear-gradient(135deg,var(--sage),#cfc7a7); }}
-    .memory-tile.ivory {{ background: linear-gradient(135deg,#f5eee8,#fffaf7); }}
-    .memory-tile.ivory span, .memory-tile.ivory strong {{ color: var(--burgundy); }}
+    .album-grid {{ width: min(1040px, 100%); column-count: 3; column-gap: 16px; }}
+    .album-card {{ position: relative; display: inline-block; width: 100%; margin: 0 0 14px; border-radius: 8px; overflow: hidden; break-inside: avoid; background: rgba(255,250,247,.94); box-shadow: var(--shadow); transition: transform 220ms ease, box-shadow 220ms ease; }}
+    .album-card:hover, .event-card:hover {{ transform: translateY(-4px); box-shadow: 0 34px 86px rgba(72,41,35,.18); }}
+    .album-card img {{ width: 100%; height: auto; display: block; background: var(--linen); transition: filter 500ms ease; }}
+    .album-card:hover img {{ filter: saturate(1.04) contrast(1.02); }}
+    .album-card.small {{ width: 82%; margin-left: 9%; margin-right: 9%; }}
+    .album-card.mini {{ width: 72%; margin-left: 14%; margin-right: 14%; }}
+    .album-card.double {{ width: 100%; }}
+    .album-card.large .album-caption {{ padding: 12px 14px 13px; }}
+    .album-card.large .album-caption strong {{ font-size: clamp(1rem, 1.3vw, 1.24rem); }}
+    .album-card.large .album-caption span {{ font-size: .7rem; }}
+    .album-card::after {{ content: ""; position: absolute; inset: auto 0 0; height: 54%; background: linear-gradient(180deg, rgba(31,17,14,0), rgba(31,17,14,.82)); pointer-events: none; }}
+    .album-caption {{ position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: block; padding: 13px 14px 14px; color: #fff; }}
+    .album-caption strong {{ display: block; color: #fff; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.05rem, 1.45vw, 1.34rem); line-height: 1.02; text-shadow: 0 2px 12px rgba(31,17,14,.36); }}
+    .album-caption span {{ display: -webkit-box; margin-top: 5px; color: rgba(255,255,255,.9); font-size: .74rem; line-height: 1.28; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-shadow: 0 1px 8px rgba(31,17,14,.38); }}
+    .proposal-space {{ display: inline-block; width: 100%; margin: 0 0 18px; break-inside: avoid; padding: 22px; border: 1px solid rgba(123,38,56,.16); border-radius: 8px; background: radial-gradient(circle at 20% 15%, rgba(214,195,163,.34), transparent 36%), linear-gradient(135deg, rgba(123,38,56,.08), rgba(255,250,247,.96)); box-shadow: var(--shadow); }}
+    .proposal-space span {{ color: var(--gold); font-size: .72rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }}
+    .proposal-space strong {{ display: block; margin-top: 10px; color: var(--burgundy); font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.4rem,2.4vw,2rem); line-height: 1; }}
+    .proposal-space p {{ margin: 10px 0 0; color: var(--muted); }}
 
     .event-grid {{ display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }}
     .event-card, div[data-testid="stVerticalBlockBorderWrapper"] {{ border: 1px solid rgba(123,38,56,.12); border-radius: 8px; background: rgba(255,250,247,.9); box-shadow: var(--shadow); }}
@@ -345,8 +391,7 @@ def css(data: dict[str, object]) -> str:
       .hero {{ min-height: 88vh; padding: 70px 18px; }}
       h1 {{ font-size: clamp(4rem,17vw,6.25rem); }}
       .section-grid, .event-grid, .registry-layout {{ grid-template-columns: 1fr; }}
-      .gallery-grid {{ grid-template-columns: 1fr 1fr; grid-template-rows: 280px 170px 170px; }}
-      .memory-tile.feature {{ grid-column: 1 / -1; grid-row: auto; }}
+      .album-grid {{ column-count: 3; }}
       .detail-list {{ grid-template-columns: 1fr; }}
     }}
     @media (max-width: 520px) {{
@@ -354,7 +399,11 @@ def css(data: dict[str, object]) -> str:
       .brand img {{ width: 52px; }}
       .nav-button {{ min-height: 38px; padding: 0 14px; }}
       .section {{ padding-inline: 16px; }}
-      .gallery-grid {{ grid-template-columns: 1fr; grid-template-rows: 260px repeat(4,150px); }}
+      .album-grid {{ column-count: 1; }}
+      .album-card.small {{ width: 100%; margin-left: 0; margin-right: 0; }}
+      .album-card.mini, .album-card.double {{ width: 100%; margin-left: 0; margin-right: 0; }}
+      .album-caption strong {{ font-size: 1.25rem; }}
+      .album-caption span {{ font-size: .82rem; }}
       .timeline li {{ grid-template-columns: 1fr; }}
       .site-footer {{ display: grid; }}
       .sticky-rsvp {{ display: none; }}
@@ -549,20 +598,40 @@ def story(data: dict[str, object]) -> None:
 
 
 def gallery() -> None:
-    html_block(
+    cards: list[str] = []
+    for photo in ALBUM_PHOTOS:
+        path = ALBUM_ASSETS / str(photo["file"])
+        if not path.exists():
+            continue
+        cards.append(
+            f"""
+            <figure class="album-card {escape(str(photo["class"]))}">
+              <img src="{album_image_uri(str(path))}" alt="{escape(str(photo["title"]))}" loading="lazy">
+              <figcaption class="album-caption">
+                <strong>{escape(str(photo["title"]))}</strong>
+                <span>{escape(str(photo["caption"]))}</span>
+              </figcaption>
+            </figure>
+            """
+        )
+    cards.append(
         """
+        <article class="proposal-space">
+          <span>Coming soon</span>
+          <strong>The proposal</strong>
+          <p>A special space is waiting here for the chapter that made forever official.</p>
+        </article>
+        """
+    )
+    html_block(
+        f"""
         <section class="section gallery" id="gallery">
           <div class="section-intro">
             <p class="eyebrow">Gallery</p>
             <h2>A few of our favourite memories along the way...</h2>
+            <p>From first trips and family days to candid little moments, these are pieces of the story that brought us here.</p>
           </div>
-          <div class="gallery-grid">
-            <article class="memory-tile feature"><span>CK</span><strong>Forever starts here</strong></article>
-            <article class="memory-tile blush"><span>01</span><strong>First conversations</strong></article>
-            <article class="memory-tile burgundy"><span>02</span><strong>Trips that became chapters</strong></article>
-            <article class="memory-tile sage"><span>03</span><strong>The proposal</strong></article>
-            <article class="memory-tile ivory"><span>04</span><strong>Family, laughter, home</strong></article>
-          </div>
+          <div class="album-grid">{"".join(cards)}</div>
         </section>
         """
     )
