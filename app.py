@@ -63,7 +63,15 @@ def image_uri(path: Path) -> str:
     if not path.exists():
         return ""
     encoded = base64.b64encode(path.read_bytes()).decode("utf-8")
-    return f"data:image/png;base64,{encoded}"
+    mime_types = {
+        ".svg": "image/svg+xml",
+        ".webp": "image/webp",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+    }
+    mime = mime_types.get(path.suffix.lower(), "application/octet-stream")
+    return f"data:{mime};base64,{encoded}"
 
 
 @st.cache_data(show_spinner=False)
@@ -425,7 +433,11 @@ def password_screen() -> bool:
     if st.session_state.get("site_unlocked"):
         return True
 
-    logo = image_uri(ASSETS / "logo-burgundy.png")
+    logo = image_uri(ASSETS / "logo-champagne.png")
+    floral_garland = image_uri(ASSETS / "login-florals-garland.webp")
+    floral_divider = image_uri(ASSETS / "login-florals-divider.webp")
+    garland_display = "block" if floral_garland else "none"
+    divider_display = "block" if floral_divider else "none"
     html_block(
         f"""
         <style>
@@ -437,73 +449,328 @@ def password_screen() -> bool:
         .stApp {{
           min-height: 100vh;
           background:
+            radial-gradient(circle at 18% 74%, rgba(123, 38, 56, 0.10), transparent 22%),
+            radial-gradient(circle at 82% 24%, rgba(169, 119, 36, 0.14), transparent 24%),
             radial-gradient(circle at 24% 18%, rgba(214, 195, 163, 0.26), transparent 30%),
             linear-gradient(135deg, #fffaf7, #f8f5f2 58%, #ede6df);
           color: #2b2b2b;
           font-family: Lato, Avenir, "Segoe UI", sans-serif;
         }}
         .private-entry {{
-          min-height: 56vh;
+          min-height: auto;
           display: grid;
-          place-items: end center;
-          padding: 32px 18px 18px;
+          place-items: center;
+          padding: clamp(30px, 6vw, 62px) 18px 24px;
+          position: relative;
+          overflow: hidden;
         }}
-        .private-card {{
-          width: min(520px, 100%);
-          padding: clamp(28px, 6vw, 48px);
-          border: 1px solid rgba(123, 38, 56, 0.14);
-          border-radius: 10px;
-          background: rgba(255, 250, 247, 0.92);
-          box-shadow: 0 28px 80px rgba(72, 41, 35, 0.14);
+        .private-entry::before,
+        .private-entry::after {{
+          display: none;
+        }}
+        .invite-scene {{
+          width: min(520px, calc(100vw - 36px));
           text-align: center;
+          position: relative;
+          z-index: 1;
         }}
-        .private-card img {{
-          width: 86px;
-          margin-bottom: 22px;
-          filter: drop-shadow(0 8px 18px rgba(88, 23, 37, 0.12));
+        .invite-scene::before,
+        .invite-scene::after {{
+          display: none;
+        }}
+        .envelope-florals {{
+          position: absolute;
+          width: min(430px, 76vw);
+          height: 150px;
+          pointer-events: none;
+          opacity: 0.92;
+          z-index: 5;
+          display: {garland_display};
+          background: url("{floral_garland}") center / contain no-repeat;
+          filter: saturate(1.22) contrast(1.08) drop-shadow(0 18px 26px rgba(72, 41, 35, 0.14));
+          left: 50%;
+          top: 10%;
+          transform: translateX(-50%) translateY(-16px) scale(0.90);
+          transition: opacity 420ms ease, transform 520ms ease;
+        }}
+        .invite-date {{
+          display: none;
+        }}
+        .invite-toggle {{
+          position: absolute;
+          inline-size: 1px;
+          block-size: 1px;
+          opacity: 0;
+          pointer-events: none;
+        }}
+        .envelope {{
+          position: relative;
+          z-index: 2;
+          width: min(420px, 86vw);
+          aspect-ratio: 1.48;
+          margin: 0 auto;
+          filter: drop-shadow(0 30px 46px rgba(72, 41, 35, 0.18));
+        }}
+        .envelope::before,
+        .envelope::after {{
+          content: "";
+          position: absolute;
+          border-radius: 5px;
+          background: linear-gradient(145deg, #d9d4bf, #efe9d6);
+          border: 1px solid rgba(123, 38, 56, 0.14);
+        }}
+        .envelope::before {{
+          inset: auto 0 0;
+          height: 72%;
+          clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+          z-index: 3;
+        }}
+        .envelope::after {{
+          inset: 28% 0 auto;
+          height: 44%;
+          clip-path: polygon(0 0, 100% 0, 50% 88%);
+          background: linear-gradient(180deg, #eee8d3, #cdc7ad);
+          z-index: 4;
+          transform-origin: 50% 0;
+          transform: perspective(900px) rotateX(0deg);
+          transition: transform 520ms ease, opacity 520ms ease;
+        }}
+        .invite-card {{
+          position: absolute;
+          left: 14%;
+          right: 14%;
+          top: -18px;
+          z-index: 1;
+          min-height: 88%;
+          padding: 22px 22px 44px;
+          border: 1px solid rgba(123, 38, 56, 0.13);
+          border-radius: 10px;
+          background:
+            linear-gradient(90deg, rgba(184, 150, 88, 0.16), transparent 9%, transparent 91%, rgba(184, 150, 88, 0.14)),
+            radial-gradient(circle at 16% 18%, rgba(214, 195, 163, 0.18), transparent 18%),
+            radial-gradient(circle at 86% 82%, rgba(123, 38, 56, 0.07), transparent 22%),
+            rgba(255, 250, 247, 0.98);
+          box-shadow:
+            inset 0 0 0 1px rgba(255, 255, 255, 0.62),
+            0 18px 44px rgba(72, 41, 35, 0.10);
+          opacity: 0;
+          transform: translateY(50px) scale(0.96);
+          transition: transform 620ms cubic-bezier(.2,.7,.2,1), opacity 360ms ease;
+        }}
+        .invite-card::before,
+        .invite-card::after {{
+          content: "";
+          position: absolute;
+          left: 12%;
+          right: 12%;
+          height: 10px;
+          border-radius: 999px;
+          background: linear-gradient(90deg, transparent, rgba(169, 119, 36, 0.54), transparent);
+          opacity: 0.72;
+        }}
+        .invite-card::before {{ top: -5px; }}
+        .invite-card::after {{ bottom: -5px; }}
+        .invite-border {{
+          position: absolute;
+          inset: 16px 18px;
+          pointer-events: none;
+          z-index: 0;
+        }}
+        .invite-border::before,
+        .invite-border::after {{
+          content: "";
+          position: absolute;
+          inset: 0;
+          border: 1px solid rgba(176, 105, 84, 0.48);
+          border-radius: 3px;
+        }}
+        .invite-border::before {{
+          transform: rotate(-2.3deg);
+        }}
+        .invite-border::after {{
+          transform: rotate(2deg);
+          border-color: rgba(169, 119, 36, 0.34);
+        }}
+        .invite-border span {{
+          display: none;
+        }}
+        .private-card .eyebrow,
+        .private-card h1 {{
+          position: relative;
+          z-index: 1;
+        }}
+        .invite-seal {{
+          position: absolute;
+          left: 50%;
+          bottom: 42px;
+          z-index: 14;
+          width: 68px;
+          height: 68px;
+          display: grid;
+          place-items: center;
+          transform: translateX(-50%);
+          border-radius: 50%;
+          background:
+            radial-gradient(circle at 34% 25%, rgba(255, 219, 164, 0.20), transparent 0 24%, transparent 25%),
+            radial-gradient(circle at 50% 50%, #92354a 0 45%, #7b2638 62%, #581725 100%);
+          border: 1px solid rgba(244, 213, 138, 0.64);
+          box-shadow:
+            inset 0 0 0 3px rgba(244, 213, 138, 0.28),
+            inset 0 -8px 16px rgba(40, 6, 14, 0.22),
+            0 12px 26px rgba(88, 23, 37, 0.26);
+          cursor: pointer;
+          transition: transform 280ms ease, box-shadow 280ms ease;
+        }}
+        .invite-seal:hover {{
+          transform: translateX(-50%) translateY(-2px) scale(1.04);
+          box-shadow:
+            inset 0 0 0 3px rgba(244, 213, 138, 0.36),
+            inset 0 -8px 16px rgba(40, 6, 14, 0.20),
+            0 18px 34px rgba(88, 23, 37, 0.32);
+        }}
+        .invite-seal img {{
+          width: 50px;
+          filter:
+            saturate(1.45)
+            contrast(1.08)
+            brightness(1.18)
+            drop-shadow(0 4px 8px rgba(40, 6, 14, 0.22));
+        }}
+        .seal-hint {{
+          position: relative;
+          z-index: 2;
+          margin: 18px 0 0;
+          color: #7b2638;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 1rem;
+          font-style: italic;
+          letter-spacing: 0.08em;
+          transition: opacity 300ms ease;
+        }}
+        #invite-open:checked + .envelope::after {{
+          transform: perspective(900px) rotateX(72deg);
+          opacity: 0.34;
+          z-index: 2;
+        }}
+        #invite-open:checked + .envelope::before {{
+          z-index: 7;
+        }}
+        .invite-scene:has(#invite-open:checked) {{
+          z-index: 20;
+        }}
+        #invite-open:checked + .envelope .envelope-florals {{
+          z-index: 2;
+          opacity: 0.22;
+          transform: translateX(-50%) translateY(42px) scale(0.72);
+        }}
+        #invite-open:checked + .envelope .invite-card {{
+          z-index: 5;
+          opacity: 1;
+          transform: translateY(10px) scale(1);
+        }}
+        #invite-open:checked + .envelope .invite-seal {{
+          transform: translateX(-50%) translateY(62px) scale(0.78);
+        }}
+        .invite-scene:has(#invite-open:checked) .seal-hint {{
+          opacity: 0;
         }}
         .private-card .eyebrow {{
-          margin: 0 0 12px;
+          margin: 0 0 8px;
           color: #a97724;
-          font-size: 0.75rem;
+          font-size: 0.55rem;
           font-weight: 900;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
         }}
         .private-card h1 {{
           margin: 0;
           color: #7b2638;
           font-family: Georgia, "Times New Roman", serif;
-          font-size: clamp(2.4rem, 8vw, 4rem);
-          line-height: 0.96;
+          font-size: clamp(0.98rem, 2.75vw, 1.38rem);
+          line-height: 1.13;
+          letter-spacing: 0;
         }}
-        .private-card p {{
-          margin: 16px auto 0;
-          max-width: 360px;
-          color: #6f625c;
-          line-height: 1.65;
+        .invite-divider-floral {{
+          position: relative;
+          z-index: 1;
+          display: {divider_display};
+          width: min(170px, 48%);
+          height: 46px;
+          margin: 6px auto 0;
+          background: url("{floral_divider}") center / contain no-repeat;
+          filter: saturate(1.12) contrast(1.05) drop-shadow(0 8px 12px rgba(72, 41, 35, 0.10));
+        }}
+        div[data-testid="stForm"] {{
+          position: relative;
+          z-index: 12;
+          width: min(340px, calc(100% - 48px));
+          max-height: 0;
+          margin: -88px auto 0;
+          padding: 0 !important;
+          border: 0 !important;
+          background: transparent !important;
+          box-shadow: none !important;
+          opacity: 0;
+          overflow: hidden;
+          pointer-events: none;
+          transform: translateY(-20px) scale(0.96);
+          transition: opacity 340ms ease 220ms, transform 420ms ease 220ms, max-height 420ms ease 180ms;
+        }}
+        .stApp:has(#invite-open:checked) div[data-testid="stForm"] {{
+          max-height: 240px;
+          opacity: 1;
+          pointer-events: auto;
+          transform: translateY(44px) scale(1);
+        }}
+        div[data-testid="stForm"] > div {{
+          position: relative;
+          z-index: 2;
+          padding: 16px 18px 18px !important;
+          border: 1px solid rgba(255, 250, 247, 0.78) !important;
+          border-radius: 26px !important;
+          background:
+            linear-gradient(145deg, rgba(255,250,247,0.96), rgba(248,245,242,0.88)) !important;
+          box-shadow:
+            inset 0 0 0 1px rgba(216, 200, 178, 0.28),
+            0 18px 42px rgba(72, 41, 35, 0.16) !important;
+          backdrop-filter: blur(8px);
+        }}
+        div[data-testid="stForm"] > div::before {{
+          content: "";
+          position: absolute;
+          top: 9px;
+          left: 50%;
+          width: 54px;
+          height: 2px;
+          transform: translateX(-50%);
+          background: linear-gradient(90deg, transparent, rgba(154, 123, 67, 0.72), transparent);
         }}
         div[data-testid="stTextInput"] {{
-          width: min(420px, calc(100% - 36px));
+          width: 100%;
           margin: 0 auto;
         }}
         div[data-testid="stTextInput"] label {{
-          color: #2b2b2b;
+          color: #6f625c;
+          font-size: 0.68rem;
           font-weight: 900;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
         }}
         div[data-testid="stTextInput"] input {{
-          min-height: 52px;
+          min-height: 42px;
           border-radius: 999px;
-          border: 1px solid rgba(123, 38, 56, 0.18);
-          background: #fffaf7;
+          border: 1px solid rgba(123, 38, 56, 0.16);
+          background: rgba(255, 250, 247, 0.96);
           color: #2b2b2b;
+          font-size: 0.96rem;
+          box-shadow: 0 8px 18px rgba(88, 23, 37, 0.10);
         }}
         div.stButton {{
-          width: min(420px, calc(100% - 36px));
-          margin: 16px auto 0;
+          width: 100%;
+          margin: 10px auto 0;
         }}
         div.stButton > button {{
-          min-height: 48px;
+          min-height: 42px;
           border: 0;
           border-radius: 999px;
           background: #7b2638;
@@ -517,21 +784,43 @@ def password_screen() -> bool:
           margin: 14px auto 0;
           border-radius: 8px;
         }}
+        @media (max-width: 640px) {{
+          .private-entry {{ padding-top: 30px; }}
+          .envelope-florals {{ width: 300px; height: 104px; top: 9%; transform: translateX(-50%) translateY(-12px) scale(0.76); }}
+          .envelope {{ width: min(330px, 88vw); }}
+          .invite-card {{ left: 12%; right: 12%; top: -12px; min-height: 88%; padding: 18px 18px 42px; }}
+          .invite-seal {{ width: 58px; height: 58px; bottom: 38px; }}
+          .invite-seal img {{ width: 42px; }}
+          #invite-open:checked + .envelope .invite-card {{ transform: translateY(8px) scale(1); }}
+          #invite-open:checked + .envelope .envelope-florals {{ transform: translateX(-50%) translateY(34px) scale(0.58); }}
+          #invite-open:checked + .envelope .invite-seal {{ transform: translateX(-50%) translateY(54px) scale(0.78); }}
+          div[data-testid="stForm"] {{ margin-top: -52px; width: min(300px, calc(100% - 54px)); }}
+          .stApp:has(#invite-open:checked) div[data-testid="stForm"] {{ transform: translateY(38px) scale(1); }}
+          div[data-testid="stForm"] > div {{ padding-inline: 16px !important; }}
+        }}
         </style>
         <section class="private-entry">
-          <div class="private-card">
-            <img src="{logo}" alt="">
-            <p class="eyebrow">Private celebration</p>
-            <h1>Celine &amp; Kiran</h1>
-            <p>Please enter the wedding password to view the invitation.</p>
+          <div class="invite-scene">
+            <input class="invite-toggle" id="invite-open" type="checkbox">
+            <div class="envelope" aria-label="Sealed wedding invitation">
+              <div class="envelope-florals" aria-hidden="true"></div>
+              <div class="invite-card private-card">
+                <div class="invite-border" aria-hidden="true"><span></span><span></span></div>
+                <p class="eyebrow">Private celebration</p>
+                <h1>You are formally invited<br>to Celine and Kiran's Wedding!</h1>
+                <div class="invite-divider-floral" aria-hidden="true"></div>
+              </div>
+              <label class="invite-seal" for="invite-open" aria-label="Open the wedding invitation"><img src="{logo}" alt=""></label>
+            </div>
+            <p class="seal-hint">Click the seal to open...</p>
           </div>
         </section>
         """
     )
 
     with st.form("wedding_password_form"):
-        password = st.text_input("Password", type="password", placeholder="Enter password")
-        submitted = st.form_submit_button("Enter wedding website", use_container_width=True)
+        password = st.text_input("Password", type="password", placeholder="Password")
+        submitted = st.form_submit_button("Open invitation", use_container_width=True)
 
     if submitted:
         if password.strip() == site_password():
