@@ -807,7 +807,7 @@ def password_screen() -> bool:
               <div class="invite-card private-card">
                 <div class="invite-border" aria-hidden="true"><span></span><span></span></div>
                 <p class="eyebrow">Private celebration</p>
-                <h1>You are formally invited<br>to Celine and Kiran's Wedding!</h1>
+                <h1>You are cordially invited<br>to Celine and Kiran's Wedding!</h1>
                 <div class="invite-divider-floral" aria-hidden="true"></div>
               </div>
               <label class="invite-seal" for="invite-open" aria-label="Open the wedding invitation"><img src="{logo}" alt=""></label>
